@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simple Interest Calculator</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+
+            background:
+                radial-gradient(circle at top left, #3b82f6 0%, transparent 35%),
+                radial-gradient(circle at bottom right, #8b5cf6 0%, transparent 35%),
+                #0f172a;
+        }
+
+        /* Background animated circles */
+
+        .circle {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.25;
+            animation: float 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        .circle.one {
+            width: 180px;
+            height: 180px;
+            background: #38bdf8;
+            top: 10%;
+            left: 8%;
+        }
+
+        .circle.two {
+            width: 250px;
+            height: 250px;
+            background: #a855f7;
+            bottom: 5%;
+            right: 8%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.08);
+            }
+        }
+
+        /* Main card */
+
+        .calculator {
+            width: 100%;
+            max-width: 850px;
+
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+
+            border-radius: 28px;
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.35);
+
+            animation: cardAppear 0.8s ease;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Left side */
+
+        .left {
+            padding: 45px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 7px 14px;
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, 0.12);
+            color: #bae6fd;
+
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            color: white;
+            font-size: 34px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .description {
+            color: #cbd5e1;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Inputs */
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #e2e8f0;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px 14px 40px;
+
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+
+            background: rgba(15, 23, 42, 0.65);
+            color: white;
+
+            outline: none;
+            font-size: 16px;
+
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+
+            box-shadow:
+                0 0 0 3px rgba(56, 189, 248, 0.12);
+
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+
+            font-size: 15px;
+            font-weight: 600;
+
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .calculate {
+            color: white;
+
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #7c3aed
+            );
+
+            box-shadow:
+                0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .calculate:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 12px 25px rgba(37, 99, 235, 0.45);
+        }
+
+        .reset {
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .reset:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Right side */
+
+        .right {
+            padding: 45px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(37,99,235,0.18),
+                    rgba(124,58,237,0.18)
+                );
+        }
+
+        .result-title {
+            color: #cbd5e1;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .total {
+            font-size: 46px;
+            font-weight: 700;
+            color: white;
+
+            margin-bottom: 30px;
+
+            animation: numberAppear 0.5s ease;
+        }
+
+        @keyframes numberAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-box {
+            padding: 20px;
+
+            border-radius: 18px;
+
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+
+            margin-bottom: 15px;
+
+            transition: 0.3s;
+        }
+
+        .result-box:hover {
+            transform: translateX(5px);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .result-box span {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .result-box strong {
+            display: block;
+            color: white;
+            font-size: 22px;
+            margin-top: 5px;
+        }
+
+        .formula {
+            margin-top: 15px;
+            padding: 15px;
+
+            border-radius: 12px;
+
+            background: rgba(15,23,42,0.4);
+
+            color: #cbd5e1;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        /* Responsive */
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .calculator {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+
+            .left,
+            .right {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .total {
+                font-size: 38px;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .left,
+            .right {
+                padding: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="circle one"></div>
+    <div class="circle two"></div>
+
+    <main class="calculator">
+
+        <!-- INPUT SECTION -->
+
+        <section class="left">
+
+            <span class="badge">FINANCE TOOL</span>
+
+            <h1>Simple Interest Calculator</h1>
+
+            <p class="description">
+                Calculate the interest earned and total amount
+                using your principal, interest rate and time period.
+            </p>
+
+            <div class="input-group">
+                <label for="principal">
+                    Principal Amount
+                </label>
+
+                <div class="input-wrapper">
+                    <span>₹</span>
+
+                    <input
+                        type="number"
+                        id="principal"
+                        placeholder="Enter amount"
+                        min="0"
+                    >
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="rate">
+                    Interest Rate
+                </label>
+
+                <div class="input-wrapper">
+                    <span>%</span>
+
+                    <input
+                        type="number"
+                        id="rate"
+                        placeholder="Enter rate"
+                        min="0"
+                        step="0.01"
+                    >
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="time">
+                    Time Period (Years)
+                </label>
+
+                <div class="input-wrapper">
+                    <span>⌛</span>
+
+                    <input
+                        type="number"
+                        id="time"
+                        placeholder="Enter years"
+                        min="0"
+                        step="0.1"
+                    >
+                </div>
+            </div>
+
+            <div class="button-group">
+
+                <button
+                    class="calculate"
+                    onclick="calculateInterest()"
+                >
+                    Calculate
+                </button>
+
+                <button
+                    class="reset"
+                    onclick="resetCalculator()"
+                >
+                    Reset
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RESULT SECTION -->
+
+        <section class="right">
+
+            <p class="result-title">
+                TOTAL AMOUNT
+            </p>
+
+            <div
+                class="total"
+                id="totalAmount"
+            >
+                ₹0.00
+            </div>
+
+            <div class="result-box">
+
+                <span>
+                    Principal
+                </span>
+
+                <strong id="principalResult">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+            <div class="result-box">
+
+                <span>
+                    Simple Interest
+                </span>
+
+                <strong id="interestResult">
+                    ₹0.00
+                </strong>
+
+            </div>
+
+            <div class="result-box">
+
+                <span>
+                    Interest Rate
+                </span>
+
+                <strong id="rateResult">
+                    0%
+                </strong>
+
+            </div>
+
+            <div class="formula">
+                Simple Interest = (P × R × T) / 100
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        function calculateInterest() {
+
+            const principal =
+                parseFloat(
+                    document.getElementById("principal").value
+                );
+
+            const rate =
+                parseFloat(
+                    document.getElementById("rate").value
+                );
+
+            const time =
+                parseFloat(
+                    document.getElementById("time").value
+                );
+
+
+            if (
+                isNaN(principal) ||
+                isNaN(rate) ||
+                isNaN(time) ||
+                principal < 0 ||
+                rate < 0 ||
+                time < 0
+            ) {
+
+                alert("Please enter valid values.");
+
+                return;
+            }
+
+
+            const interest =
+                (principal * rate * time) / 100;
+
+            const total =
+                principal + interest;
+
+
+            document.getElementById("principalResult")
+                .textContent =
+                "₹" + principal.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2
+                });
+
+
+            document.getElementById("interestResult")
+                .textContent =
+                "₹" + interest.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2
+                });
+
+
+            document.getElementById("rateResult")
+                .textContent =
+                rate + "%";
+
+
+            const totalElement =
+                document.getElementById("totalAmount");
+
+
+            totalElement.style.animation = "none";
+
+            void totalElement.offsetWidth;
+
+            totalElement.style.animation =
+                "numberAppear 0.5s ease";
+
+
+            totalElement.textContent =
+                "₹" + total.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2
+                });
+        }
+
+
+        function resetCalculator() {
+
+            document.getElementById("principal").value = "";
+            document.getElementById("rate").value = "";
+            document.getElementById("time").value = "";
+
+            document.getElementById("totalAmount")
+                .textContent = "₹0.00";
+
+            document.getElementById("principalResult")
+                .textContent = "₹0.00";
+
+            document.getElementById("interestResult")
+                .textContent = "₹0.00";
+
+            document.getElementById("rateResult")
+                .textContent = "0%";
+        }
+
+    </script>
+
+</body>
+</html>
